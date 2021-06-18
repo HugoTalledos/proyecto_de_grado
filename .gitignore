@@ -3,3 +3,4 @@ config.json
 ### Python ###
 # Byte-compiled / optimized / DLL files
 /__pycache__
+/utils/__pycache__
