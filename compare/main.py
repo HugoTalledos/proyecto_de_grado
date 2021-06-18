@@ -42,9 +42,9 @@ def _average(root, metricName, outputPath, imageName, unit):
 		dataset[nameValueAux] = metricAux / len(columnsValue)
 		dataset[nameTimeAux] = (dataset[nameTimeAux] * 100) / dataset[nameTimeAux][len(dataset[nameTimeAux]) - 1]
 
-		std = dataset[nameValueAux].std()
-		dataset['MaxValue'] = dataset[nameValueAux] + std
-		dataset['MinValue'] = dataset[nameValueAux] - std
+		# std = dataset[nameValueAux].std()
+		# dataset['MaxValue'] = dataset[nameValueAux] + std
+		# dataset['MinValue'] = dataset[nameValueAux] - std
 		yExtremityLabel = (extremity.group(1)).title()
 		xTimeLabel = 'Tiempo (%)'
 		dataset.rename(columns = { nameValueAux: yExtremityLabel }, inplace=True)
