@@ -42,9 +42,9 @@ def _average(root, metricName, outputPath, imageName, unit):
 		dataset[nameValueAux] = metricAux / len(columnsValue)
 		dataset[nameTimeAux] = (dataset[nameTimeAux] * 100) / dataset[nameTimeAux][len(dataset[nameTimeAux]) - 1]
 
-		# std = dataset[nameValueAux].std()
-		# dataset['MaxValue'] = dataset[nameValueAux] + std
-		# dataset['MinValue'] = dataset[nameValueAux] - std
+		std = dataset[nameValueAux].std()
+		dataset['MaxValue'] = dataset[nameValueAux] + std
+		dataset['MinValue'] = dataset[nameValueAux] - std
 		yExtremityLabel = (extremity.group(1)).title()
 		xTimeLabel = 'Tiempo (%)'
 		dataset.rename(columns = { nameValueAux: yExtremityLabel }, inplace=True)
@@ -53,9 +53,10 @@ def _average(root, metricName, outputPath, imageName, unit):
 					'{}\\temp'.format(os.getcwd()),
             		'#PL{}#EX{}'.format(player.group(1), yExtremityLabel))
 
-		dataset.plot(x=xTimeLabel, y=[yExtremityLabel, 'MaxValue', 'MinValue'])
+		dataset.plot(x=xTimeLabel, y=[yExtremityLabel, 'MaxValue', 'MinValue'], color='black')
 		plt.xlabel('Tiempo (%)')
 		plt.ylabel('{} {} ({})'.format(metricName, yExtremityLabel, unit))
+		plt.fill_between(dataset[xTimeLabel], dataset['MaxValue'], dataset['MinValue'], color='lightgray')
 		os.makedirs('{}/{}/{}'.format(
 			outputPath,imageName, player.group(1)), exist_ok=True)
 		plt.savefig('{}/{}/{}/{}_{}.png'.format(
