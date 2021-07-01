@@ -76,7 +76,7 @@ def _compare(main , metricName, output, imageName, unit):
 if __name__ == '__main__':
 	dataPath = config()['dataPath']
 	mainPath = config()['mainPath']
-	point = config()['pointStep']
+	point = config()['points']
 	autoDelete = eval(config()['autoDeleteMode'])
 	metricName = config()['metricName']
 	output = config()['outputPath']

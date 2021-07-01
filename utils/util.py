@@ -10,3 +10,10 @@ def createFile(data, path, nameFile):
     data.to_csv(r'{}\\{}#D{}.csv'.format(
         path, nameFile, today),index=False)
     logging.info('Temp average file created')
+
+def createArrayLabels(labels):
+	labelsArray = labels.split('#')
+	labels = []
+	for label in labelsArray:
+		labels.append(label)
+	return labels
