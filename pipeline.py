@@ -10,18 +10,18 @@ logger = logging.getLogger(__name__)
 
 def main(data):
 	for path in data['dataPath']:
-		_prepare(data['mainPath'], data['clearMode'], data['output'])
+		_preparePathScheme(data['mainPath'], data['clearMode'], data['output'])
 
 		if data['graphMode'] is True:
 			_graphMode(data)
 			data['clearMode'] = True
 
 		if data['clearMode'] is False:
-			_extract(path, data['mainPath'], data['separator'], data['decimalSeparator'])
+			_extract(path, data['mainPath'], data['separator'], data['decimalSeparator'], data['columnsLabels'])
 			_percentile(data['mainPath'], data['point'], data['autoDelete'], data['columnsLabels'])
 			_compare(data['mainPath'], data['metricName'], data['output'], data['imageName'], data['unit'])
 
-def _prepare(main, clearMode, output):
+def _preparePathScheme(main, clearMode, output):
 	logger.info(' -------------------->       Clear Mode: {}      <-------------------- '.format(clearMode))
 	if os.path.isdir('{}/percentile/temp'.format(main)):
 		rmtree('{}/percentile/temp'.format(main))
@@ -52,9 +52,9 @@ def _graphMode(data):
 	logger.info(' --------------------> Graph Mode init  <-------------------- ')
 	subprocess.run(['python', 'main.py', path, header, metric, unit, output], cwd='./graph_mode')
 
-def _extract(data, main, separator, decimal):
+def _extract(data, main, separator, decimal, labels):
 	logger.info(' --------------------> Starting data organization  <-------------------- ')
-	subprocess.run(['python', 'main.py', data, separator, decimal], cwd='./extract_average')
+	subprocess.run(['python', 'main.py', data, separator, decimal, labels], cwd='./extract_average')
 	logger.info(' --------------------> Moving temp files  <-------------------- ')
 	subprocess.run(['move', r'{}\extract_average\*.csv'.format(main), r'{}\percentile\temp'.format(main)], shell=True)
 	sleep(1.5)
@@ -74,38 +74,22 @@ def _compare(main , metricName, output, imageName, unit):
 	subprocess.run(['python', 'main.py', r'{}\percentile\temp_average'.format(main), metricName, output, imageName, unit], cwd='./compare')
 
 if __name__ == '__main__':
-	dataPath = config()['dataPath']
-	mainPath = config()['mainPath']
-	point = config()['points']
-	autoDelete = eval(config()['autoDeleteMode'])
-	metricName = config()['metricName']
-	output = config()['outputPath']
-	imageName = config()['imageName']
-	clearMode = eval(config()['clearMode'])
-	columnsLabels = config()['columnsLabels']
-	separator = config()['separator']
-	decimalSep = config()['decimalSeparator']
-	unit = config()['units']
-	graphMode = eval(config()['graphMode'])
-	graphHeader = config()['graphHeader']
-	graphModePath = config()['graphModePath']
-
 	data = {
-		"dataPath": dataPath, 
-		"mainPath": mainPath,
-		"point": point,
-		"autoDelete": autoDelete,
-		"metricName": metricName,
-		"output": output,
-		"columnsLabels": columnsLabels,
-		"imageName": imageName,
-		"clearMode": clearMode,
-		"graphMode": graphMode,
-		"graphHeader": graphHeader,
-		"graphModePath": graphModePath,
-		"separator": separator,
-		"decimalSeparator": decimalSep,
-		"unit": unit
+		"dataPath": config()['dataPath'], 
+		"mainPath": config()['mainPath'],
+		"point": config()['points'],
+		"autoDelete": eval(config()['autoDeleteMode']),
+		"metricName": config()['metricName'],
+		"output": config()['outputPath'],
+		"columnsLabels": config()['columnsLabels'],
+		"imageName": config()['imageName'],
+		"clearMode": eval(config()['clearMode']),
+		"graphMode": eval(config()['graphMode']),
+		"graphHeader": config()['graphHeader'],
+		"graphModePath": config()['graphModePath'],
+		"separator": config()['separator'],
+		"decimalSeparator": config()['decimalSeparator'],
+		"unit": config()['units']
 	}
 
 	main(data)
