@@ -21,7 +21,7 @@ def _average(root, metricName, outputPath, imageName, unit):
 		rootFile = '{}/{}'.format(root, file)
 		dataset = pd.read_csv(rootFile)
 		timeAux = 0
-		player = re.search(r'#PL([a-zA-Z]*[0-9]*)', file)
+		playerName = re.search(r'#PL([a-zA-Z]*[0-9]*)', file)
 		extremity = re.search(r'#EX([a-zA-Z]*[0-9]*)', file)
 		metricAux = 0
 		columnsValue = [column for column in dataset.columns if 'Tiempo' not in column]
@@ -29,39 +29,44 @@ def _average(root, metricName, outputPath, imageName, unit):
 		nameTimeAux = ''
 		nameValueAux = ''
 
-		for column in columnsTime:
-			nameTimeAux = column
-			timeAux += dataset[column]
-			dataset = dataset.drop([column], 1)
+		for columnTime in columnsTime:
+			nameTimeAux = columnTime
+			timeAux += dataset[columnTime]
+			dataset = dataset.drop([columnTime], 1)
 		dataset[nameTimeAux] = timeAux / len(columnsTime)
 
-		for column in columnsValue:
-			nameValueAux = column
-			metricAux += dataset[column]
-			dataset = dataset.drop([column], 1)
+		for columnValue in columnsValue:
+			nameValueAux = columnValue
+			metricAux += dataset[columnValue]
+			dataset = dataset.drop([columnValue], 1)
 		dataset[nameValueAux] = metricAux / len(columnsValue)
 		dataset[nameTimeAux] = (dataset[nameTimeAux] * 100) / dataset[nameTimeAux][len(dataset[nameTimeAux]) - 1]
 
 		std = dataset[nameValueAux].std()
 		dataset['MaxValue'] = dataset[nameValueAux] + std
 		dataset['MinValue'] = dataset[nameValueAux] - std
+
 		yExtremityLabel = (extremity.group(1)).title()
 		xTimeLabel = 'Tiempo (%)'
 		dataset.rename(columns = { nameValueAux: yExtremityLabel }, inplace=True)
 		dataset.rename(columns = { nameTimeAux: xTimeLabel }, inplace=True)
 		u.createFile(dataset,
 					'{}\\temp'.format(os.getcwd()),
-            		'#PL{}#EX{}'.format(player.group(1), yExtremityLabel))
+					'#PL{}#EX{}'.format(playerName.group(1), yExtremityLabel))
 
-		dataset.plot(x=xTimeLabel, y=[yExtremityLabel, 'MaxValue', 'MinValue'], color='black')
+		plt.plot(dataset[xTimeLabel], dataset[yExtremityLabel], color='blue')
+		plt.plot(dataset[xTimeLabel], dataset['MaxValue'], ls= '--',color='black')
+		plt.plot(dataset[xTimeLabel], dataset['MinValue'], ls= '--',color='black')
+		plt.fill_between(dataset[xTimeLabel], dataset['MaxValue'], dataset['MinValue'], color='lightgray')
 		plt.xlabel('Tiempo (%)')
 		plt.ylabel('{} {} ({})'.format(metricName, yExtremityLabel, unit))
-		plt.fill_between(dataset[xTimeLabel], dataset['MaxValue'], dataset['MinValue'], color='lightgray')
-		os.makedirs('{}/{}/{}'.format(
-			outputPath,imageName, player.group(1)), exist_ok=True)
-		plt.savefig('{}/{}/{}/{}_{}.png'.format(
-			outputPath, imageName, player.group(1), imageName, yExtremityLabel))
 
+		os.makedirs('{}/{}/{}'.format(
+			outputPath,imageName, playerName.group(1)), exist_ok=True)
+		plt.savefig('{}/{}/{}/{}_{}.png'.format(
+			outputPath, imageName, playerName.group(1), imageName, yExtremityLabel))
+		plt.clf()
+	
 		logging.info('Chart image created')
 
 
