@@ -12,8 +12,8 @@ logging.basicConfig(level=logging.INFO)
 # u = Utils()
 logger = logging.getLogger(__name__)
 
-def _getExtremities(dataset):
-    expressions = ['codo', 'muñeca', 'hombro', 'cadera', 'rodilla', 'tobillo']
+def _getExtremities(dataset, labels):
+    expressions = u.createArrayLabels(labels)
     for column in dataset.columns:
         elbow = [column for column in dataset.columns if expressions[0]
                  in column.lower()]
@@ -31,7 +31,7 @@ def _getExtremities(dataset):
     return [elbow, wrist, shoulder, hip, knee, ankle]
 
 
-def _getFiles(root, separator, decimal):
+def _getFiles(root, separator, decimal, labels):
     logging.info('Beginning load files...')
 
     files = os.listdir(root)
@@ -51,16 +51,16 @@ def _getFiles(root, separator, decimal):
         for column in dataset.columns:
             newColumns[column] = '{}_{}'.format(column, idx)
         dataset.rename(columns=newColumns, inplace=True)
-        arrayDatasets.append(_joinAngles(dataset))
+        arrayDatasets.append(_joinAngles(dataset, labels))
 
     joinedDataset = pd.concat(arrayDatasets, axis=1)
-    _moveInitTimes(joinedDataset, name_player)
+    _moveInitTimes(joinedDataset, name_player, labels)
 
 
-def _joinAngles(dataset):
+def _joinAngles(dataset, labels):
     logging.info('Joining angles...')
 
-    extremities = _getExtremities(dataset)
+    extremities = _getExtremities(dataset, labels)
     dataset = dataset.fillna(0)
     for limb in extremities:
         if len(dataset[limb].columns) > 1:
@@ -74,9 +74,9 @@ def _joinAngles(dataset):
     return dataset
 
 
-def _moveInitTimes(dataset, player):
+def _moveInitTimes(dataset, player, labels):
     logging.info('Calculating duration time of movements...')
-    extremities = _getExtremities(dataset)
+    extremities = _getExtremities(dataset, labels)
     dataset = dataset.fillna(0)
     timeIndex = []
     for limb in extremities:
@@ -113,6 +113,9 @@ if __name__ == '__main__':
     parser.add_argument('decimal',
                         help='Simbolo de decimal',
                         type=str)
+    parser.add_argument('labels',
+                        help='Simbolo de decimal',
+                        type=str)
 
 args = parser.parse_args()
-_getFiles(args.root, args.separator, args.decimal)
+_getFiles(args.root, args.separator, args.decimal, args.labels)
