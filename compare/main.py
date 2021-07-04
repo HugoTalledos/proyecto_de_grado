@@ -22,7 +22,7 @@ def _average(root, metricName, outputPath, imageName, unit):
 		dataset = pd.read_csv(rootFile)
 		timeAux = 0
 		playerName = re.search(r'#PL([a-zA-Z]*[0-9]*)', file)
-		extremity = re.search(r'#EX([a-zA-Z]*[0-9]*)', file)
+		extremity = re.search(r'#EX(\S*[0-9]*)#', file)
 		metricAux = 0
 		columnsValue = [column for column in dataset.columns if 'Tiempo' not in column]
 		columnsTime = [column for column in dataset.columns if 'Tiempo' in column]
