@@ -9,29 +9,9 @@ import util as u
 
 logging.basicConfig(level=logging.INFO)
 
-# u = Utils()
 logger = logging.getLogger(__name__)
 
-def _getExtremities(dataset, labels):
-    expressions = u.createArrayLabels(labels)
-    for column in dataset.columns:
-        elbow = [column for column in dataset.columns if expressions[0]
-                 in column.lower()]
-        wrist = [column for column in dataset.columns if expressions[1]
-                 in column.lower()]
-        shoulder = [
-            column for column in dataset.columns if expressions[2] in column.lower()]
-        hip = [column for column in dataset.columns if expressions[3]
-               in column.lower()]
-        knee = [column for column in dataset.columns if expressions[4]
-                in column.lower()]
-        ankle = [column for column in dataset.columns if expressions[5]
-                 in column.lower()]
-
-    return [elbow, wrist, shoulder, hip, knee, ankle]
-
-
-def _getFiles(root, separator, decimal, labels):
+def _getFiles(root, separator, decimal, labels, timeColumn):
     logging.info('Beginning load files...')
 
     files = os.listdir(root)
@@ -54,13 +34,13 @@ def _getFiles(root, separator, decimal, labels):
         arrayDatasets.append(_joinAngles(dataset, labels))
 
     joinedDataset = pd.concat(arrayDatasets, axis=1)
-    _moveInitTimes(joinedDataset, name_player, labels)
+    _moveInitTimes(joinedDataset, name_player, labels, timeColumn)
 
 
 def _joinAngles(dataset, labels):
     logging.info('Joining angles...')
 
-    extremities = _getExtremities(dataset, labels)
+    extremities = u.getExtremities(dataset, labels)
     dataset = dataset.fillna(0)
     for limb in extremities:
         if len(dataset[limb].columns) > 1:
@@ -74,9 +54,9 @@ def _joinAngles(dataset, labels):
     return dataset
 
 
-def _moveInitTimes(dataset, player, labels):
+def _moveInitTimes(dataset, player, labels, timeColumn):
     logging.info('Calculating duration time of movements...')
-    extremities = _getExtremities(dataset, labels)
+    extremities = u.getExtremities(dataset, labels)
     dataset = dataset.fillna(0)
     timeIndex = []
     for limb in extremities:
@@ -84,7 +64,7 @@ def _moveInitTimes(dataset, player, labels):
             mask = dataset[column] != 0
             title = column.split('_')
             timeIndex.append({
-                'timeColumn': 'Tiempo (ms)_{}'.format(title[1]),
+                'timeColumn': '{}_{}'.format(timeColumn, title[1]),
                 'indexMask': dataset[column][mask].index,
                 'columnLimb': column
             })
@@ -114,8 +94,11 @@ if __name__ == '__main__':
                         help='Simbolo de decimal',
                         type=str)
     parser.add_argument('labels',
-                        help='Simbolo de decimal',
+                        help='etiquetas',
+                        type=str)
+    parser.add_argument('timeColumn',
+                        help='etiqueta de tiempo',
                         type=str)
 
 args = parser.parse_args()
-_getFiles(args.root, args.separator, args.decimal, args.labels)
+_getFiles(args.root, args.separator, args.decimal, args.labels, args.timeColumn)
