@@ -6,4 +6,5 @@ config.json
 /utils/__pycache__
 /compare/temp
 /percentile/temp_average
+/percentile/temp
 /compare/image
