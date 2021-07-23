@@ -3,76 +3,80 @@ logging.basicConfig(level=logging.INFO)
 import subprocess
 from common import config
 from time import sleep
-import os
 from shutil import rmtree
+import sys
+sys.path.append('.\\utils\\')
+import util as u
 
 logger = logging.getLogger(__name__)
 
 def main(data):
+	logger.info(' -------------------->       Clear Mode: {}      <-------------------- '.format(data['clearMode']))
 	for path in data['dataPath']:
-		_preparePathScheme(data['mainPath'], data['clearMode'], data['output'])
+		u.preparePathScheme(data['mainPath'], data['output'])
 
 		if data['graphMode'] is True:
-			_graphMode(data)
+			_graphMode([
+				data['graphModePath'],
+				data['graphHeader'],
+				data['metricName'],
+				data['unit'],
+				data['output']
+			])
 			data['clearMode'] = True
 
 		if data['clearMode'] is False:
-			_extract(path, data['mainPath'], data['separator'],
-				data['decimalSeparator'], data['columnsLabels'], data['timeColumn'])
-			_percentile(data['mainPath'], data['point'], data['autoDelete'],
-				data['columnsLabels'])
-			_compare(data['mainPath'], data['metricName'], data['output'], data['imageName'],
-				data['unit'])
+			_extract([
+				path,
+				data['mainPath'],
+				data['separator'],
+				data['decimalSeparator'],
+				data['columnsLabels'],
+				data['timeColumn']
+			])
 
-def _preparePathScheme(main, clearMode, output):
-	logger.info(' -------------------->       Clear Mode: {}      <-------------------- '.format(clearMode))
-	if os.path.isdir('{}/percentile/temp'.format(main)):
-		rmtree('{}/percentile/temp'.format(main))
+			_percentile([
+				data['mainPath'],
+				data['point'],
+				data['autoDelete'],
+				data['columnsLabels']
+			])
 
-	if os.path.isdir('{}/percentile/temp_average'.format(main)):
-		rmtree('{}/percentile/temp_average'.format(main))
-
-	if os.path.isdir('{}/compare/image'.format(main)):
-		rmtree('{}/compare/image'.format(main))
-
-	if os.path.isdir('{}/compare/temp'.format(main)):
-		rmtree('{}/compare/temp'.format(main))
-
-	sleep(1)
-	logger.info(' --------------------> checking project structure  <-------------------- ')
-	os.makedirs('{}/percentile/temp'.format(main), exist_ok=True)
-	os.makedirs('{}/percentile/temp_average'.format(main), exist_ok=True)
-	os.makedirs('{}/compare/temp'.format(main), exist_ok=True)
-	os.makedirs(output, exist_ok=True)
-	sleep(1)
+			_compare([
+				data['mainPath'],
+				data['metricName'],
+				data['output'],
+				data['imageName'],
+				data['unit']
+			])
 
 def _graphMode(data):
-	path = data['graphModePath']
-	header = data['graphHeader']
-	metric = data['metricName'] 
-	unit = data['unit'] 
-	output = data['output']
+	[path, header, metric, unit, output] = data
 	logger.info(' --------------------> Graph Mode init  <-------------------- ')
 	subprocess.run(['python', 'main.py', path, header, metric, unit, output], cwd='./graph_mode')
 
-def _extract(data, main, separator, decimal, labels, timeColumn):
+def _extract(data):
+	[path, main, separator, decimal, labels, timeColumn] = data
 	logger.info(' --------------------> Starting data organization  <-------------------- ')
-	subprocess.run(['python', 'main.py', data, separator, decimal, labels, timeColumn], cwd='./extract_average')
+	subprocess.run(['python', 'main.py', path, separator, decimal, labels, timeColumn], cwd='./extract_average')
+
 	logger.info(' --------------------> Moving temp files  <-------------------- ')
 	subprocess.run(['move', r'{}\extract_average\*.csv'.format(main), r'{}\percentile\temp'.format(main)], shell=True)
 	sleep(1.5)
 	subprocess.run(['cls'], shell=True)
 
-def _percentile(main, point, delete, columnsLabels):
+def _percentile(data):
+	[main, point, delete, columnsLabels] = data
 	logger.info(' --------------------> Starting data interpolation  <-------------------- ')
 	subprocess.run(['python', 'main.py', point, columnsLabels], cwd='./percentile')
+
 	if bool(delete):
 		logger.info(' --------------------> Removing temp files  <-------------------- ')
 		rmtree(r'{}\percentile\\temp'.format(main))
 		sleep(1)
-	
 
-def _compare(main , metricName, output, imageName, unit):
+def _compare(data):
+	[main, metricName, output, imageName, unit] = data
 	logger.info(' --------------------> Starting compare process <-------------------- ')
 	subprocess.run(['python', 'main.py', r'{}\percentile\temp_average'.format(main), metricName, output, imageName, unit], cwd='./compare')
 
