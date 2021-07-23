@@ -11,7 +11,8 @@ logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
-def _getFiles(root, separator, decimal, labels, timeColumn):
+def _getFiles(data):
+    [root, separator, decimal, labels, timeColumn] = data
     logging.info('Beginning load files...')
 
     files = os.listdir(root)
@@ -71,9 +72,14 @@ def _moveInitTimes(dataset, player, labels, timeColumn):
 
     for idx, element in enumerate(timeIndex):
         firstTime = dataset[element['timeColumn']][element['indexMask'][0]]
+        keyTime = '{}{}'.format(element['timeColumn'], idx)
+        valueTime = (dataset[element['timeColumn']][element['indexMask']] - firstTime).tolist()
+
+        keyExtremity = '{}{}'.format(element['columnLimb'], idx)
+        valueExtremity = (dataset[element['columnLimb']][element['indexMask']]).tolist()
         dataMoveDict = {
-            '{}{}'.format(element['timeColumn'], idx): (dataset[element['timeColumn']][element['indexMask']] - firstTime).tolist(),
-            '{}{}'.format(element['columnLimb'], idx): (dataset[element['columnLimb']][element['indexMask']]).tolist()
+            keyTime: valueTime,
+            keyExtremity: valueExtremity
         }
         name = element['columnLimb'].replace(' ', '_')
         name = name.replace('/', '%')
@@ -101,4 +107,4 @@ if __name__ == '__main__':
                         type=str)
 
 args = parser.parse_args()
-_getFiles(args.root, args.separator, args.decimal, args.labels, args.timeColumn)
+_getFiles([args.root, args.separator, args.decimal, args.labels, args.timeColumn])

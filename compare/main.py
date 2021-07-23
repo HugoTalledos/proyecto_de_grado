@@ -13,16 +13,17 @@ import util as u
 
 logger = logging.getLogger(__name__)
 
-def _average(root, metricName, outputPath, imageName, unit):
+def _average(data):
+	[root, metricName, outputPath, imageName, unit] = data
 	logging.info('Calculating averages')
 
 	files = os.listdir(root)
 	for file in files:
 		rootFile = '{}/{}'.format(root, file)
 		dataset = pd.read_csv(rootFile)
-		timeAux = 0
 		playerName = re.search(r'#PL([a-zA-Z]*[0-9]*)', file)
 		extremity = re.search(r'#EX(\S*[0-9]*)#', file)
+		timeAux = 0
 		metricAux = 0
 		columnsValue = [column for column in dataset.columns if 'Tiempo' not in column]
 		columnsTime = [column for column in dataset.columns if 'Tiempo' in column]
@@ -54,6 +55,7 @@ def _average(root, metricName, outputPath, imageName, unit):
 					'{}\\temp'.format(os.getcwd()),
 					'#PL{}#EX{}'.format(playerName.group(1), yExtremityLabel))
 
+		# Create image with normal band 
 		plt.plot(dataset[xTimeLabel], dataset[yExtremityLabel], color='blue')
 		plt.plot(dataset[xTimeLabel], dataset['MaxValue'], ls= '--',color='black')
 		plt.plot(dataset[xTimeLabel], dataset['MinValue'], ls= '--',color='black')
@@ -89,4 +91,4 @@ if __name__ == '__main__':
 						type=str)
 
 	args = parser.parse_args()
-	_average(args.root, args.metricName, args.outputPath, args.imageName, args.unit)
+	_average([args.root, args.metricName, args.outputPath, args.imageName, args.unit])

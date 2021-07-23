@@ -3,7 +3,6 @@ import pandas as pd
 import logging
 import re
 import sys
-from datetime import datetime
 logging.basicConfig(level=logging.INFO)
 import os
 sys.path.append('..\\utils\\')

@@ -28,9 +28,10 @@ def _getFiles(data):
                 if re.search(header, column):
                     plt.plot(dataset[column], color=colors[idx])
 
-    # plt.axhline(0, 0, linestyle= '--', color= (0.69, 0.69, 0.69)  , label='pyplot horizontal line')
     plt.xlabel('Tiempo (%)')
     plt.ylabel('{} {} ({})'.format(metric, header, unit))
+
+    # Avoid repeated labels in chart
     plt.legend([Line2D([0], [0], color=clave[0], lw=2) for clave in labels],
            [clave[1] for clave in labels])
     os.makedirs('{}/Individuales/{}/'.format(output, name.group(1)), exist_ok=True)
