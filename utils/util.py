@@ -16,10 +16,11 @@ logger = logging.getLogger(__name__)
     fileName: Created file name
 """
 def createFile(data, path, fileName):
-	today = (datetime.today()).strftime('%Y-%m-%d-%H%M%S')
-	data.to_csv(r'{}\\{}#D{}.csv'.format(
-        path, fileName, today),index=False)
-	logging.info('Temp average file created')
+    today = (datetime.today()).strftime('%Y-%m-%d-%H%M%S')
+    os.makedirs(path, exist_ok=True)
+    data.to_csv(r'{}\\{}#D{}.csv'.format(path, fileName, today),
+        index=False)
+    logging.info('Temp average file created')
 
 
 """ Create Array labels
