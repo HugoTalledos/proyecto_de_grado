@@ -47,21 +47,36 @@ def main(data):
 				data['metricName'],
 				data['output'],
 				data['imageName'],
-				data['unit']
+				data['unit'],
 			])
 
 def _graphMode(data):
 	[path, header, metric, unit, output] = data
 	logger.info(' --------------------> Graph Mode init  <-------------------- ')
-	subprocess.run(['python', 'main.py', path, header, metric, unit, output], cwd='./graph_mode')
+	subprocess.run([
+		'python', 'main.py',
+		path,
+		header,
+		metric,
+		unit,
+		output], cwd='./graph_mode')
 
 def _extract(data):
 	[path, main, separator, decimal, labels, timeColumn] = data
 	logger.info(' --------------------> Starting data organization  <-------------------- ')
-	subprocess.run(['python', 'main.py', path, separator, decimal, labels, timeColumn], cwd='./extract_average')
+	subprocess.run([
+		'python', 'main.py',
+		path,
+		separator,
+		decimal,
+		labels,
+		timeColumn], cwd='./extract_average')
 
 	logger.info(' --------------------> Moving temp files  <-------------------- ')
-	subprocess.run(['move', r'{}\extract_average\*.csv'.format(main), r'{}\percentile\temp'.format(main)], shell=True)
+	subprocess.run([
+		'move',
+		r'{}\extract_average\*.csv'.format(main),
+		r'{}\percentile\temp'.format(main)], shell=True)
 	sleep(1.5)
 	subprocess.run(['cls'], shell=True)
 
@@ -78,7 +93,13 @@ def _percentile(data):
 def _compare(data):
 	[main, metricName, output, imageName, unit] = data
 	logger.info(' --------------------> Starting compare process <-------------------- ')
-	subprocess.run(['python', 'main.py', r'{}\percentile\temp_average'.format(main), metricName, output, imageName, unit], cwd='./compare')
+	subprocess.run([
+		'python', 'main.py',
+		r'{}\percentile\temp_average'.format(main),
+		metricName,
+		output,
+		imageName,
+		unit], cwd='./compare')
 
 if __name__ == '__main__':
 	data = {
