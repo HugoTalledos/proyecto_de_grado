@@ -51,9 +51,10 @@ def _average(data):
 		xTimeLabel = 'Tiempo (%)'
 		dataset.rename(columns = { nameValueAux: yExtremityLabel }, inplace=True)
 		dataset.rename(columns = { nameTimeAux: xTimeLabel }, inplace=True)
+
 		u.createFile(dataset,
-					'{}\\temp'.format(os.getcwd()),
-					'#PL{}#EX{}'.format(playerName.group(1), yExtremityLabel))
+					'{}\\{}\\data'.format(outputPath, playerName.group(1)),
+					'{} - {} - {}'.format(metricName, playerName.group(1), yExtremityLabel))
 
 		# Create image with normal band 
 		plt.plot(dataset[xTimeLabel], dataset[yExtremityLabel], color='blue')
@@ -63,10 +64,9 @@ def _average(data):
 		plt.xlabel('Tiempo (%)')
 		plt.ylabel('{} {} ({})'.format(metricName, yExtremityLabel, unit))
 
-		os.makedirs('{}/{}/{}'.format(
-			outputPath,imageName, playerName.group(1)), exist_ok=True)
-		plt.savefig('{}/{}/{}/{}_{}.png'.format(
-			outputPath, imageName, playerName.group(1), imageName, yExtremityLabel))
+		os.makedirs('{0}/{1}/{2}'.format(outputPath, playerName.group(1), imageName), exist_ok=True)
+		plt.savefig('{0}/{1}/{2}/{2}_{3}.png'.format(
+			outputPath, playerName.group(1), imageName, yExtremityLabel))
 		plt.clf()
 	
 		logging.info('Chart image created')
@@ -91,4 +91,10 @@ if __name__ == '__main__':
 						type=str)
 
 	args = parser.parse_args()
-	_average([args.root, args.metricName, args.outputPath, args.imageName, args.unit])
+	_average([
+		args.root,
+		args.metricName,
+		args.outputPath,
+		args.imageName,
+		args.unit,
+	])
