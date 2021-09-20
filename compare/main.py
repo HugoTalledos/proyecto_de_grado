@@ -13,8 +13,25 @@ import util as u
 
 logger = logging.getLogger(__name__)
 
+def _createNormalBand(dataset, xTimeLabel, yExtremityLabel, data, playerName):
+	[*_, metricName, outputPath, imageName, unit] = data
+	plt.plot(dataset[xTimeLabel], dataset[yExtremityLabel], color='blue')
+	plt.plot(dataset[xTimeLabel], dataset['MaxValue'], ls= '--',color='black')
+	plt.plot(dataset[xTimeLabel], dataset['MinValue'], ls= '--',color='black')
+	plt.fill_between(dataset[xTimeLabel], dataset['MaxValue'], dataset['MinValue'], color='lightgray')
+	plt.xlabel('Tiempo (%)')
+	plt.ylabel('{} {} ({})'.format(metricName, yExtremityLabel, unit))
+
+	os.makedirs('{0}/{1}/{2}'.format(outputPath, playerName.group(1), imageName), exist_ok=True)
+	plt.savefig('{0}/{1}/{2}/{2}_{3}.png'.format(
+		outputPath, playerName.group(1), imageName, yExtremityLabel))
+	plt.clf()
+
+	logging.info('Chart image created')
+
+
 def _average(data):
-	[root, metricName, outputPath, imageName, unit] = data
+	[root, metricName, outputPath, *_] = data
 	logging.info('Calculating averages')
 
 	files = os.listdir(root)
@@ -48,6 +65,7 @@ def _average(data):
 		dataset['MinValue'] = dataset[nameValueAux] - std
 
 		yExtremityLabel = (extremity.group(1)).title()
+
 		xTimeLabel = 'Tiempo (%)'
 		dataset.rename(columns = { nameValueAux: yExtremityLabel }, inplace=True)
 		dataset.rename(columns = { nameTimeAux: xTimeLabel }, inplace=True)
@@ -57,19 +75,16 @@ def _average(data):
 					'{} - {} - {}'.format(metricName, playerName.group(1), yExtremityLabel))
 
 		# Create image with normal band 
-		plt.plot(dataset[xTimeLabel], dataset[yExtremityLabel], color='blue')
-		plt.plot(dataset[xTimeLabel], dataset['MaxValue'], ls= '--',color='black')
-		plt.plot(dataset[xTimeLabel], dataset['MinValue'], ls= '--',color='black')
-		plt.fill_between(dataset[xTimeLabel], dataset['MaxValue'], dataset['MinValue'], color='lightgray')
-		plt.xlabel('Tiempo (%)')
-		plt.ylabel('{} {} ({})'.format(metricName, yExtremityLabel, unit))
+		_createNormalBand(dataset, xTimeLabel, yExtremityLabel, data, playerName)
 
-		os.makedirs('{0}/{1}/{2}'.format(outputPath, playerName.group(1), imageName), exist_ok=True)
-		plt.savefig('{0}/{1}/{2}/{2}_{3}.png'.format(
-			outputPath, playerName.group(1), imageName, yExtremityLabel))
-		plt.clf()
-	
-		logging.info('Chart image created')
+		dataset['std'] = std
+		dataset['ai'] = dataset[yExtremityLabel][0]
+		dataset['af'] = dataset[yExtremityLabel][71]
+
+		u.createFile(dataset,
+						'{}\\temp'.format(os.getcwd()),
+						'#PL{}#EX{}'.format(playerName.group(1), yExtremityLabel))
+
 
 
 if __name__ == '__main__':
