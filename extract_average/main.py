@@ -18,11 +18,13 @@ def _getFiles(data):
     files = os.listdir(root)
     csv_files = []
     name_player = ''
+    playerID = ''
     for file in files:
         if os.path.isfile(os.path.join(root, file)) and file.endswith(".csv"):
             csv_files.append(file)
-            regex = re.search(r'_([a-zA-Z]*)', file)
-            name_player = regex.group(1)
+            regex = re.search(r'([0-9]*)_([a-zA-Z]*)', file)
+            playerID = regex.group(1)
+            name_player = regex.group(2)
 
     arrayDatasets = []
     for idx, csv_file in enumerate(csv_files):
@@ -35,7 +37,7 @@ def _getFiles(data):
         arrayDatasets.append(_joinAngles(dataset, labels))
 
     joinedDataset = pd.concat(arrayDatasets, axis=1)
-    _moveInitTimes(joinedDataset, name_player, labels, timeColumn)
+    _moveInitTimes(joinedDataset, name_player, playerID, labels, timeColumn)
 
 
 def _joinAngles(dataset, labels):
@@ -55,7 +57,7 @@ def _joinAngles(dataset, labels):
     return dataset
 
 
-def _moveInitTimes(dataset, player, labels, timeColumn):
+def _moveInitTimes(dataset, player, playerId, labels, timeColumn):
     logging.info('Calculating duration time of movements...')
     extremities = u.getExtremities(dataset, labels)
     dataset = dataset.fillna(0)
@@ -84,7 +86,7 @@ def _moveInitTimes(dataset, player, labels, timeColumn):
         name = element['columnLimb'].replace(' ', '_')
         name = name.replace('/', '%')
         u.createFile(pd.DataFrame(dataMoveDict), os.getcwd(),
-            '#PL{}#EX{}'.format(player, name))
+            '#PL{}#PI{}#EX{}'.format(player, playerId, name))
 
     logging.info('Temp file created!')
 

@@ -23,6 +23,7 @@ def _main(point, labels):
 			metricValueArray = []
 			fileRoot = '{}/{}'.format(root, file)
 			player = re.search(r'#PL([a-zA-Z]*[0-9]*)', file)
+			playerID = re.search(r'#PI([0-9]*)', file)
 
 			isFile = os.path.isfile(os.path.join(root, file))
 			isCsv = file.endswith(".csv")
@@ -45,7 +46,7 @@ def _main(point, labels):
 		response = pd.concat(datasetArray, axis=1)
 		u.createFile(response,
 					'{}\\temp_average'.format(os.getcwd()),
-            		'#PL{}#EX{}'.format(player.group(1), label))
+            		'#PL{}#PI{}#EX{}'.format(player.group(1), playerID.group(1), label))
 
 def _interpolation(dataset, timeValue, timeLabel, label):
 	for j in range(len(dataset)-1):
