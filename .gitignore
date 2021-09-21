@@ -8,3 +8,5 @@ config.json
 /percentile/temp_average
 /percentile/temp
 /compare/image
+*.db
+/save_data/__pycache__
