@@ -50,6 +50,11 @@ def main(data):
 				data['unit'],
 			])
 
+			_save_data([
+				data['mainPath'],
+				data['fileName']
+			])
+
 def _graphMode(data):
 	[path, header, metric, unit, output] = data
 	logger.info(' --------------------> Graph Mode init  <-------------------- ')
@@ -101,6 +106,14 @@ def _compare(data):
 		imageName,
 		unit], cwd='./compare')
 
+def _save_data(data):
+	[fileRoot, fileName] = data
+	logger.info(' --------------------> Savign data <-------------------- ')
+	subprocess.run(
+		['python', 'main.py', fileRoot, fileName],
+		cwd='.ave_data'
+	)
+
 if __name__ == '__main__':
 	data = {
 		"dataPath": config()['dataPath'], 
@@ -118,7 +131,8 @@ if __name__ == '__main__':
 		"graphModePath": config()['graphModePath'],
 		"separator": config()['separator'],
 		"decimalSeparator": config()['decimalSeparator'],
-		"unit": config()['units']
+		"unit": config()['units'],
+		"fileName": config()['fileName']
 	}
 
 	main(data)
