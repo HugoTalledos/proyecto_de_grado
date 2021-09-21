@@ -3,10 +3,9 @@ config.json
 ### Python ###
 # Byte-compiled / optimized / DLL files
 /__pycache__
-/utils/__pycache__
+*/__pycache__
 /compare/temp
 /percentile/temp_average
 /percentile/temp
 /compare/image
 *.db
-/save_data/__pycache__
