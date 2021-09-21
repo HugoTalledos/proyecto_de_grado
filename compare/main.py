@@ -40,6 +40,7 @@ def _average(data):
 		dataset = pd.read_csv(rootFile)
 		playerName = re.search(r'#PL([a-zA-Z]*[0-9]*)', file)
 		extremity = re.search(r'#EX(\S*[0-9]*)#', file)
+		playerID = re.search(r'#PI([0-9]*)', file)
 		timeAux = 0
 		metricAux = 0
 		columnsValue = [column for column in dataset.columns if 'Tiempo' not in column]
@@ -83,7 +84,7 @@ def _average(data):
 
 		u.createFile(dataset,
 						'{}\\temp'.format(os.getcwd()),
-						'#PL{}#EX{}'.format(playerName.group(1), yExtremityLabel))
+						'#PL{}#PI{}#EX{}'.format(playerName.group(1), playerID.group(1), yExtremityLabel))
 
 
 
