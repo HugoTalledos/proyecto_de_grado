@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def _getFiles(data):
-    [root, separator, decimal, labels, timeColumn] = data
+    [root, separator, decimal, labels, fileName, timeColumn] = data
     logging.info('Beginning load files...')
 
     files = os.listdir(root)
@@ -20,12 +20,14 @@ def _getFiles(data):
     name_player = ''
     playerID = ''
     for file in files:
-        if os.path.isfile(os.path.join(root, file)) and file.endswith(".csv"):
+        isFile = os.path.isfile(os.path.join(root, file))
+        isCsv = file.endswith(".csv")
+        isComplementData = file.startswith(fileName)
+        if  isFile and isCsv and not isComplementData:
             csv_files.append(file)
             regex = re.search(r'([0-9]*)_([a-zA-Z]*)', file)
             playerID = regex.group(1)
             name_player = regex.group(2)
-
     arrayDatasets = []
     for idx, csv_file in enumerate(csv_files):
         csv_root = root + '\\' + csv_file
@@ -107,6 +109,16 @@ if __name__ == '__main__':
     parser.add_argument('timeColumn',
                         help='etiqueta de tiempo',
                         type=str)
+    parser.add_argument('fileName',
+                        help='etiqueta de tiempo',
+                        type=str)
 
 args = parser.parse_args()
-_getFiles([args.root, args.separator, args.decimal, args.labels, args.timeColumn])
+_getFiles([
+    args.root,
+    args.separator,
+    args.decimal,
+    args.labels,
+    args.timeColumn,
+    args.fileName
+])
