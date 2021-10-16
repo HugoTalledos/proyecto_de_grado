@@ -32,7 +32,8 @@ def main(data):
 				data['separator'],
 				data['decimalSeparator'],
 				data['columnsLabels'],
-				data['timeColumn']
+				data['timeColumn'],
+				data['fileName']
 			])
 
 			_percentile([
@@ -51,6 +52,7 @@ def main(data):
 			])
 
 			_save_data([
+				path,
 				data['mainPath'],
 				data['fileName']
 			])
@@ -67,7 +69,7 @@ def _graphMode(data):
 		output], cwd='./graph_mode')
 
 def _extract(data):
-	[path, main, separator, decimal, labels, timeColumn] = data
+	[path, main, separator, decimal, labels, fileName, timeColumn] = data
 	logger.info(' --------------------> Starting data organization  <-------------------- ')
 	subprocess.run([
 		'python', 'main.py',
@@ -75,7 +77,8 @@ def _extract(data):
 		separator,
 		decimal,
 		labels,
-		timeColumn], cwd='./extract_average')
+		timeColumn,
+		fileName], cwd='./extract_average')
 
 	logger.info(' --------------------> Moving temp files  <-------------------- ')
 	subprocess.run([
@@ -107,11 +110,11 @@ def _compare(data):
 		unit], cwd='./compare')
 
 def _save_data(data):
-	[fileRoot, fileName] = data
+	[path, fileRoot, fileName] = data
 	logger.info(' --------------------> Savign data <-------------------- ')
 	subprocess.run(
-		['python', 'main.py', fileRoot, fileName],
-		cwd='.ave_data'
+		['python', 'main.py', path, fileRoot, fileName],
+		cwd='./save_data'
 	)
 
 if __name__ == '__main__':
