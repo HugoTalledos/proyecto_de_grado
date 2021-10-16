@@ -2,9 +2,7 @@ import argparse
 import re
 import pandas as pd
 import logging
-from datetime import datetime
 import os
-import sys
 from player import Player
 from base import Base, engine, Session
 logging.basicConfig(level=logging.INFO)
@@ -14,7 +12,6 @@ logger = logging.getLogger(__name__)
 def save_data(playerData, playerId): 
   Base.metadata.create_all(engine)
   session = Session()
-  
   player = Player(playerId,
                   playerData['peso'],
                   playerData['aniosE'],
@@ -43,21 +40,23 @@ def save_data(playerData, playerId):
   session.commit()
   session.close()
 
-def add_data(fileRoot, fileName):
-  root = '{}/compare/temp'.format(os.getcwd())
+def add_data(path, fileRoot, fileName):
+  root = '{}/compare/temp'.format(fileRoot)
   files = os.listdir(root)
-  playerId = ''
+
+  playerName = ''
   playerData = {}
   for file in files:
     rootFile = '{}/{}'.format(root, file)
     dataset = pd.read_csv(rootFile)
+    playerName = re.search(r'#PL([a-zA-Z]*[0-9]*)', file)
     playerId = re.search(r'#PI([0-9]*)', file)
     extremity = re.search(r'#EX(\S*[0-9]*)#', file)
     playerData['aI_{}'.format(extremity.group(1).lower())] = dataset['ai'][0]
     playerData['aF_{}'.format(extremity.group(1).lower())] = dataset['af'][0]
     playerData['std_{}'.format(extremity.group(1).lower())] = dataset['std'][0]
 
-  rootFile = '{}\\{}_{}.csv'.format(fileRoot, fileName, playerId.group(1))
+  rootFile = '{}\\{}_{}.csv'.format(path, fileName, playerName.group(1))
   extraData = pd.read_csv(rootFile)
   playerData['aniosE'] = extraData['years'][0]
   playerData['peso'] = extraData['peso'][0]
@@ -67,6 +66,9 @@ def add_data(fileRoot, fileName):
   
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
+  parser.add_argument('path',
+                      help='Ruta de archivos /carpeta1/carpeta2',
+                      type=str)
   parser.add_argument('root',
                       help='Ruta de archivos /carpeta1/carpeta2',
                       type=str)
@@ -74,4 +76,4 @@ if __name__ == '__main__':
                       help='',
                       type=str)
   args = parser.parse_args()
-  add_data(args.root, args.fileName)
+  add_data(args.path, args.root, args.fileName)
