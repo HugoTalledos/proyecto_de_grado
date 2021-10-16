@@ -6,9 +6,9 @@ class Player(Base):
 	__tablename__ = 'players'
 
 	id = Column(String, primary_key=True)
-	peso = Column(String)
-	aniosE = Column(Integer)
-	aIMunieca = Column(Float)
+	peso = Column(Float)
+	aniosE = Column(Float)
+	aIMunieca = Column(String)
 	aFMunieca = Column(Float)
 	stdMunieca = Column(Float)
 	aICodo = Column(Float)
@@ -32,7 +32,7 @@ class Player(Base):
         id,
         peso,
         aniosE,
-        aImunieca,
+        aIMunieca,
         aFMunieca,
         stdMunieca,
         aICodo,
@@ -54,7 +54,7 @@ class Player(Base):
           self.id = id
           self.peso = peso
           self.aniosE = aniosE
-          self.aImunieca =  aImunieca
+          self.aIMunieca =  aIMunieca
           self.aFMunieca =  aFMunieca
           self.stdMunieca = stdMunieca
           self.aICodo = aICodo
@@ -72,4 +72,4 @@ class Player(Base):
           self.aITobillo =  aITobillo
           self.aFTobillo =  aFTobillo
           self.stdTobillo = stdTobillo
-          self.efectivida = efectividad
+          self.efectividad = efectividad
