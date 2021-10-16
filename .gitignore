@@ -9,3 +9,4 @@ config.json
 /percentile/temp
 /compare/image
 *.db
+*.csv
