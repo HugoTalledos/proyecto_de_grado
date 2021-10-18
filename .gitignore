@@ -10,3 +10,5 @@ config.json
 /compare/image
 *.db
 *.csv
+backend-credentials.json
+.env
