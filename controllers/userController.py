@@ -1,18 +1,17 @@
-from firebasePy import getInstance
 from handle_response import successResponse, errorResponse
 
-firestore = getInstance()
 userCollection = 'users'
 
-def createUser(data):
+def createUser(firestore, data):
   try:
+    db = firestore.get_firestore_instance()
     accountExist = False
-    query = firestore.collection(userCollection).where(u'email', u'==', data['email'])
+    query = db.collection(userCollection).where(u'email', u'==', data['email'])
     docs = query.stream()
     for dosc in docs:
       accountExist = True
     if not accountExist:
-      firestore.collection(userCollection).document().set({
+      db.collection(userCollection).document().set({
         'email': data['email'],
         'id': data['userData']['id'],
         'name': data['userData']['name'],
