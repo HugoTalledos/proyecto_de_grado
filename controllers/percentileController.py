@@ -1,10 +1,8 @@
-import argparse
 import pandas as pd
 import logging
 import re
 import sys
 logging.basicConfig(level=logging.INFO)
-import os
 sys.path.append('..\\utils\\')
 import util as u
 
