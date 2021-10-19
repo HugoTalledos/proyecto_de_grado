@@ -9,7 +9,7 @@ sys.path.append('.\\drivers\\')
 sys.path.append('.\\utils\\')
 
 from graphModeController import startGraphMode
-from util import getDataset
+from util import getDataset, deletePath
 from firebasePy import FirestoreApp
 import userController
 
@@ -49,6 +49,11 @@ def startProcces():
       ])
 
   return response
+
+@app.route('/clearMode', methods=['POST'])
+def clearMode():
+  deletePath(request.json)
+  return { 'success': True, 'data': 'Archivos eliminados exitosamente' }
 
 @app.route('/users', methods=['POST'])
 def createUser():
