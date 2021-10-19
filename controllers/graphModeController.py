@@ -29,7 +29,7 @@ def _getFiles(data):
     # Avoid repeated labels in chart
     plt.legend([Line2D([0], [0], color=clave[0], lw=2) for clave in labels],
            [clave[1] for clave in labels])
-    root = '{}/Individuales/{}_{}'.format(documentNumber, metric, playerName)
+    root = '{}/images/Individuales/{}_{}'.format(documentNumber, metric, playerName)
     buf = io.BytesIO()
     plt.savefig(buf, format= 'png')
     createImage(root, buf.getvalue())
