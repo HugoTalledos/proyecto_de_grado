@@ -2,11 +2,49 @@
 import logging
 from datetime import datetime
 from time import sleep
+import pandas as pd
 import os
 from shutil import rmtree
+import datetime
+import re
+from google.cloud import storage
+from dotenv import load_dotenv
 logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(__name__)
+load_dotenv()
+bucket_name = os.getenv('BUCKET_NAME')
+
+def getDataset(path, nameFile, separator, decimalSeparator):
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    blobName = '{}/{}'.format(path, nameFile)
+    blob = bucket.blob(blobName)
+    url = blob.generate_signed_url(
+        version= "v4",
+        expiration=datetime.timedelta(minutes=15),
+        method= 'GET',
+        )
+    return pd.read_csv(url, sep=separator, decimal=decimalSeparator)
+
+def createImage(destinationBlob, sourceBlob):
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    file = bucket.blob(destinationBlob)
+    file.upload_from_string(
+        sourceBlob,
+        content_type='image/png')
+
+def deletePath(path):
+    print(path)
+    storage_client = storage.Client()
+    # Note: Client.list_blobs requires at least package version 1.17.0.
+    blobs = storage_client.list_blobs(bucket_name)
+
+    for blob in blobs:
+        if re.search(path, blob.name):
+            blob.delete()
+
 
 """ Create File
     Method to create a csv file containing the creation date
