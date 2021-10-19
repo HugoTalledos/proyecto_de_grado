@@ -86,13 +86,17 @@ def startProcess():
   tempDf = startPercentile([ column, listTempDf ])
 
   metricName = 'Movimiento Angular' if metric == '1' else 'Velocidad Lineal' if metric == '2' else 'Velocidad Angular'
-  startCompare([
+  nameVariable = 'ma' if metric == '1' else 'vl' if metric == '2' else 'va'
+  finalDatasetList = startCompare([
     tempDf,
     metricName,
     body['unity'],
     documentNumber,
-    playerName
+    playerName,
+    column,
+    nameVariable
   ])
+
   return ''
 
 @app.route('/users', methods=['POST'])
