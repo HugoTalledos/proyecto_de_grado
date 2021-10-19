@@ -53,11 +53,10 @@ def deletePath(path):
     path: Path where the file will be created
     fileName: Created file name
 """
-def createFile(data, path, fileName):
-    today = (datetime.today()).strftime('%Y-%m-%d-%H%M%S')
-    os.makedirs(path, exist_ok=True)
-    data.to_csv(r'{}\\{}#D{}.csv'.format(path, fileName, today),
-        index=False)
+def createFile(data, path):
+    storage_client = storage.Client()
+    bucket = storage_client.get_bucket(bucket_name)
+    bucket.blob(path).upload_from_string(data.to_csv(index=False), 'text/csv')
     logging.info('Temp average file created')
 
 
