@@ -87,7 +87,7 @@ def getExtremities(dataset, labels):
     for label in expressions:
         columnsLabels = []
         for column in dataset.columns:
-            if label.lower() in column.lower():
+            if re.search(label.lower(), column.lower()):
                 columnsLabels.append(column)
         arrayExtemitiesLabels.append(columnsLabels)
     return arrayExtemitiesLabels
