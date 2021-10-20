@@ -12,6 +12,7 @@ from graphModeController import startGraphMode
 from extractAverageController import startExtractAverage
 from percentileController import startPercentile
 from compareController import startCompare
+from saveDataController import startSaveData
 from util import getDataset, deletePath
 from firebasePy import FirestoreApp
 import userController
@@ -97,6 +98,17 @@ def startProcess():
     nameVariable
   ])
 
+  startSaveData([
+    finalDatasetList,
+    documentNumber,
+    body['age'],
+    body['weight'],
+    body['sex'],
+    body['experience'],
+    body['efectivity'],
+    metricName.replace(' ', '_'),
+    body['gestureType']
+  ])
   return ''
 
 @app.route('/users', methods=['POST'])
