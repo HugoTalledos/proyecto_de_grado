@@ -82,7 +82,6 @@ def _average(data):
 		root = '{0}/data/{1}/{2}'.format(playerID, metricName, fileName)
 		u.createFile(df, root)
 		datasetList.append(df)
-	print(len(datasetList))
 	return datasetList
 
 
