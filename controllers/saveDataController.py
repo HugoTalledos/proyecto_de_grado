@@ -1,8 +1,6 @@
 from google.cloud import bigquery
 import logging
 
-from six import viewvalues
-
 logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(__name__)
