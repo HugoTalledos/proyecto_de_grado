@@ -1,5 +1,7 @@
+from flask import make_response
+
 def successResponse(success, data):
   return { 'success': success, 'data': data }
 
 def errorResponse(status, error):
-  return { 'success': False, 'status': status, 'error': error }
+  return make_response({ 'success': False, 'error': error }, status)
