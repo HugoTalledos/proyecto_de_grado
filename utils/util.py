@@ -22,7 +22,7 @@ def getDataset(path, nameFile, separator, decimalSeparator):
     blob = bucket.blob(blobName)
     url = blob.generate_signed_url(
         version= "v4",
-        expiration=datetime.timedelta(minutes=15),
+        expiration=datetime.timedelta(minutes=1),
         method= 'GET',
         )
     return pd.read_csv(url, sep=separator, decimal=decimalSeparator)
@@ -36,13 +36,12 @@ def createImage(destinationBlob, sourceBlob):
         content_type='image/png')
 
 def deletePath(path):
-    print(path)
     storage_client = storage.Client()
     # Note: Client.list_blobs requires at least package version 1.17.0.
     blobs = storage_client.list_blobs(bucket_name)
 
     for blob in blobs:
-        if re.search(path, blob.name):
+        if re.search(str(path), blob.name):
             blob.delete()
 
 
