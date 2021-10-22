@@ -20,7 +20,7 @@ def _createNormalBand(dataset, xTimeLabel, yExtremityLabel, data):
 	plt.xlabel('Tiempo (%)')
 	plt.ylabel('{} {} ({})'.format(metricName, yExtremityLabel, unit))
 
-	root = '{}/images/NormalBand/{}_{}'.format(documentNumber, playerName, yExtremityLabel)
+	root = '{}/images/NormalBand/{}_{}_{}'.format(documentNumber, metricName, playerName, yExtremityLabel)
 	buf = io.BytesIO()
 	plt.savefig(buf, fromat='png')
 	u.createImage(root, buf.getvalue())
@@ -72,7 +72,10 @@ def _average(data):
 		df.rename(columns = { nameTimeAux: xTimeLabel }, inplace=True)
 
 		# Create image with normal band 
-		_createNormalBand(df, xTimeLabel, yExtremityLabel, data)
+		try:
+			_createNormalBand(df, xTimeLabel, yExtremityLabel, data)
+		except:
+			return { 'status': 500, 'success':False, 'message': 'Error creando banda normal. ERR#G02' }
 
 		df['{}_std_{}'.format(nameVariable, yExtremityLabel)] = std
 		df['{}_i_{}'.format(nameVariable, yExtremityLabel)] = df[yExtremityLabel][0]
@@ -80,9 +83,12 @@ def _average(data):
 
 		fileName = '{}_{}'.format(playerName, yExtremityLabel)
 		root = '{0}/data/{1}/{2}'.format(playerID, metricName, fileName)
-		u.createFile(df, root)
+		try:
+			u.createFile(df, root)
+		except:
+			{ 'status': 500, 'success':False, 'message': 'Error creando Archivo final. ERR#G03' }
 		datasetList.append(df)
-	return datasetList
+	return { 'success': True, 'data': datasetList }
 
 
 def startCompare(body):

@@ -1,4 +1,5 @@
 from google.cloud import bigquery
+from handle_response import successResponse, errorResponse
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -16,8 +17,7 @@ def _createSquema(gestureType, tableName, data):
     logging.info("Created dataset {}".format(dataset_id))
   except Exception as e:
     print(e)
-    dataset = None
-    logging.info('{} ya existe'.format(dataset_id))
+    logging.info('Dataset {} ya existe'.format(dataset_id))
 
   
   table_id = '{}.{}'.format(dataset_id,tableName)
@@ -26,26 +26,28 @@ def _createSquema(gestureType, tableName, data):
     columns = list(data.keys())
     columns.sort()
     for column in columns:
-      squema.append(bigquery.SchemaField(column, 'STRING', mode='REQUIRED'))
+      squema.append(bigquery.SchemaField(column, 'STRING'))
 
     table = bigquery.Table(table_id, squema)
     table = client.create_table(table)
     logging.info("Created table {}".format(table_id))
   except Exception as e:
     print(e)
-    logging.info('{} ya existe'.format(table_id))
+    logging.info('Tabla {} ya existe'.format(table_id))
 
-  _insertData(client, data, table_id)
+  return _insertData(client, data, table_id)
 
 
 
 def _insertData(client, data, table_id):
-  print(data, table_id)
   try:
     client.insert_rows_json(table_id, [data])
+    logging.info('Datos insertados en {}'.format(table_id))
+    return successResponse(True, 'Datos insertados')
   except Exception as e:
     print(e)
     logging.info('Error insertando datos')
+    return { 'status': 500, 'success':False, 'message': 'Error insertando en BD. ERR#SD02' }
 
 
 
@@ -53,14 +55,17 @@ def _add_data(data):
   [listDf, documentNumber, age, weight, sex, experience, efectivity, metricName, gestureType] = data
 
   playerData = {}
-  for df in listDf:
-    i = df.columns[5]
-    f = df.columns[6]
-    std = df.columns[4]
-    playerData[i] = str(df[i][0])
-    playerData[f] = str(df[f][0])
-    playerData[std] = str(df[std][0])
-  # print(playerData)
+  try:
+    for df in listDf:
+      i = df.columns[5]
+      f = df.columns[6]
+      std = df.columns[4]
+      playerData[i.replace('ñ', 'n')] = str(df[i][0])
+      playerData[f.replace('ñ', 'n')] = str(df[f][0])
+      playerData[std.replace('ñ', 'n')] = str(df[std][0])
+  except:
+    return { 'status': 500, 'success':False, 'message': 'Error insertando en BD. ERR#SD01' }
+
   playerData['idJugador'] = str(documentNumber)
   playerData['edad'] = str(age)
   playerData['peso'] = str(weight)
@@ -68,7 +73,9 @@ def _add_data(data):
   playerData['experiencia'] = str(experience)
   playerData['efectividad'] = str(efectivity)
 
-  _createSquema(gestureType, metricName, playerData)
+  gestureName = 'Saque_con_salto' if gestureType == '1' else 'Saque_sin_salto' if gestureType == '2' else 'Remate'
+
+  return _createSquema(gestureName, metricName, playerData)
   
 def startSaveData(body):
-  _add_data(body)
+ return  _add_data(body)

@@ -10,31 +10,34 @@ logger = logging.getLogger(__name__)
 
 def _main(listTempDf, point, labels):
 	listDataset = []
-	for label in labels:
-		logging.info('Interpolating points for {}'.format(label))
-		datasetArray = []
-		for df in listTempDf:
-			calculatedFile = pd.DataFrame()
-			percentilCalculatedArray = []
-			metricValueArray = []
-			isRequired = re.search(label, df.columns[1].lower())
-			if isRequired:
-				timeColumn = df.columns[0]
-				labelColumn = df.columns[1]
-				lastTimeValue = df[timeColumn][len(df) -1]
-				points = 100/int(point)
-				for step in range(0, 101, int(points)):
-					timeValuePercentile = (lastTimeValue * int(step))/100
-					value = _interpolation(df, timeValuePercentile, timeColumn, labelColumn)
-					percentilCalculatedArray.append(timeValuePercentile)
-					metricValueArray.append(value)
+	try: 
+		for label in labels:
+			logging.info('Interpolating points for {}'.format(label))
+			datasetArray = []
+			for df in listTempDf:
+				calculatedFile = pd.DataFrame()
+				percentilCalculatedArray = []
+				metricValueArray = []
+				isRequired = re.search(label, df.columns[1].lower())
+				if isRequired:
+					timeColumn = df.columns[0]
+					labelColumn = df.columns[1]
+					lastTimeValue = df[timeColumn][len(df) -1]
+					points = 100/int(point)
+					for step in range(0, 101, int(points)):
+						timeValuePercentile = (lastTimeValue * int(step))/100
+						value = _interpolation(df, timeValuePercentile, timeColumn, labelColumn)
+						percentilCalculatedArray.append(timeValuePercentile)
+						metricValueArray.append(value)
 
-				calculatedFile[timeColumn] = percentilCalculatedArray
-				calculatedFile[labelColumn] = metricValueArray
-				datasetArray.append(calculatedFile)
-		response = pd.concat(datasetArray, axis=1)
-		listDataset.append(response)
-	return listDataset
+					calculatedFile[timeColumn] = percentilCalculatedArray
+					calculatedFile[labelColumn] = metricValueArray
+					datasetArray.append(calculatedFile)
+			response = pd.concat(datasetArray, axis=1)
+			listDataset.append(response)
+	except:
+		return { 'status': 500, 'success':False, 'message': 'Error interpolando videos. ERR#I01' }
+	return { 'success': True, 'data': listDataset }
 
 def _interpolation(dataset, timeValue, timeLabel, label):
 	for j in range(len(dataset)-1):
