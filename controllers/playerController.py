@@ -4,14 +4,17 @@ playerCollection = ' players'
 
 def createPlayer(firestore, data):
   db = firestore.get_firestore_instance()
-  
   try:
-    db.collection(playerCollection).document(data['documentNumber']).set({
+    db.collection(playerCollection).document().set({
       'playerName': data['name'],
       'documentNumber': data['documentNumber'],
+      'sex': data['sex'],
+      'weight': data['weight'],
       'age': data['age'],
       'experience': data['experience'],
       'efectivity': data['efectivity'],
+      'processStatus': data['status'],
+      'picture': data['photo'],
     })
     return successResponse(True, 'Jugador creado')
   except Exception as e:
@@ -22,7 +25,7 @@ def getPlayers(firestore):
   try:
     db = firestore.get_firestore_instance()
     playerList = []
-    docs = db.collection(u'players').stream()
+    docs = db.collection(playerCollection).stream()
     for doc in docs:
       playerList.append(doc.to_dict())
     return successResponse(True, playerList)
