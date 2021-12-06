@@ -4,7 +4,7 @@ import sys
 
 from utils.handle_response import errorResponse
 sys.path.append('..\\utils\\')
-import util as u
+import utils.util as u
 
 logging.basicConfig(level=logging.INFO)
 

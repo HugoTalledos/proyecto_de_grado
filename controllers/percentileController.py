@@ -4,7 +4,7 @@ import re
 import sys
 logging.basicConfig(level=logging.INFO)
 sys.path.append('..\\utils\\')
-import util as u
+import utils.util as u
 
 logger = logging.getLogger(__name__)
 

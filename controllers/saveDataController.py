@@ -1,5 +1,5 @@
 from google.cloud import bigquery
-from handle_response import successResponse, errorResponse
+from utils.handle_response import successResponse, errorResponse
 import logging
 
 logging.basicConfig(level=logging.INFO)

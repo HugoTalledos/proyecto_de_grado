@@ -1,4 +1,5 @@
 from flask import Flask, request
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_cors import CORS
 from dotenv import load_dotenv
 from functools import wraps
@@ -11,15 +12,15 @@ sys.path.append('.\\controllers\\')
 sys.path.append('.\\drivers\\')
 sys.path.append('.\\utils\\')
 
-from graphModeController import startGraphMode
-from extractAverageController import startExtractAverage
-from percentileController import startPercentile
-from compareController import startCompare
-from saveDataController import startSaveData
-from playerController import createPlayer, getPlayers
-from util import getDataset, deletePath
-from firebasePy import FirestoreApp
-import userController
+from controllers.graphModeController import startGraphMode
+from controllers.extractAverageController import startExtractAverage
+from controllers.percentileController import startPercentile
+from controllers.compareController import startCompare
+from controllers.saveDataController import startSaveData
+from controllers.playerController import createPlayer, getPlayers
+from utils.util import getDataset, deletePath
+from drivers.firebasePy import FirestoreApp
+import controllers.userController as userController
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
@@ -28,6 +29,7 @@ logger = logging.getLogger(__name__)
 
 firestore = FirestoreApp()
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app)
 CORS(app) 
 
 def validate_token(f):
@@ -185,4 +187,4 @@ def createPlayerRoute():
   return response
 
 if __name__ == '__main__':
-	app.run(host='0.0.0.0')
+	app.run(host='127.0.0.1', port=8080, debug=True)

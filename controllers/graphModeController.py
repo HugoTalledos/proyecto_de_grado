@@ -3,8 +3,8 @@ import re
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import logging
-from handle_response import successResponse, errorResponse
-from util import createImage
+from utils.handle_response import successResponse, errorResponse
+from utils.util import createImage
 logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(__name__)

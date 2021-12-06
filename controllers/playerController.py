@@ -1,4 +1,4 @@
-from handle_response import successResponse, errorResponse
+from utils.handle_response import successResponse, errorResponse
 userCollection = 'users'
 playerCollection = 'players'
 
