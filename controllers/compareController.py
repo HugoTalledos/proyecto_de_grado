@@ -11,7 +11,7 @@ import util as u
 logger = logging.getLogger(__name__)
 
 def _createNormalBand(dataset, xTimeLabel, yExtremityLabel, data):
-	[_, metricName, unit, documentNumber, playerName, *_] = data
+	[_, metricName, unit, documentNumber, playerName, _, _, gestureName] = data
 
 	plt.plot(dataset[xTimeLabel], dataset[yExtremityLabel], color='blue')
 	plt.plot(dataset[xTimeLabel], dataset['MaxValue'], ls= '--',color='black')
@@ -20,7 +20,7 @@ def _createNormalBand(dataset, xTimeLabel, yExtremityLabel, data):
 	plt.xlabel('Tiempo (%)')
 	plt.ylabel('{} {} ({})'.format(metricName, yExtremityLabel, unit))
 
-	root = '{}/images/NormalBand/{}_{}_{}'.format(documentNumber, metricName, playerName, yExtremityLabel)
+	root = '{0}/images/{1}/{2}/{2}_{3}_{4}'.format(documentNumber, gestureName, metricName, playerName, yExtremityLabel)
 	buf = io.BytesIO()
 	plt.savefig(buf, fromat='png')
 	u.createImage(root, buf.getvalue())
@@ -31,7 +31,7 @@ def _createNormalBand(dataset, xTimeLabel, yExtremityLabel, data):
 
 
 def _average(data):
-	[listTempDf, metricName, _, playerID, playerName, labels, nameVariable] = data
+	[listTempDf, metricName, _, playerID, playerName, labels, nameVariable, gestureName] = data
 	logging.info('Calculating averages')
 	columns = u.createArrayLabels(labels)
 	datasetList = []
@@ -82,7 +82,7 @@ def _average(data):
 		df['{}_f_{}'.format(nameVariable, yExtremityLabel)] = df[yExtremityLabel][71]
 
 		fileName = '{}_{}'.format(playerName, yExtremityLabel)
-		root = '{0}/data/{1}/{2}'.format(playerID, metricName, fileName)
+		root = '{0}/data/{1}/{2}/{3}'.format(playerID, gestureName, metricName, fileName)
 		try:
 			u.createFile(df, root)
 		except:
@@ -92,7 +92,9 @@ def _average(data):
 
 
 def startCompare(body):
-	[listTempDf, metric, unity, documentNumber, name, labels, nameVariable] = body
+	[listTempDf, metric, unity, documentNumber, name, labels, nameVariable, gestureType] = body
+	gestureName = 'Saque_con_salto' if gestureType == '1' else 'Saque_sin_salto' if gestureType == '2' else 'Remate'
+
 	data = [
 		listTempDf,
 		metric,
@@ -100,7 +102,8 @@ def startCompare(body):
 		documentNumber,
 		name,
 		labels,
-		nameVariable
+		nameVariable,
+		gestureName
 	]
 
 	datasetList =_average(data)

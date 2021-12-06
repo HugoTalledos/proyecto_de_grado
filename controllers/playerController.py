@@ -1,6 +1,6 @@
 from handle_response import successResponse, errorResponse
 userCollection = 'users'
-playerCollection = ' players'
+playerCollection = 'players'
 
 def createPlayer(firestore, data):
   db = firestore.get_firestore_instance()

@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 from functools import wraps
@@ -64,6 +64,7 @@ def validate_token(f):
     return decorator
 
 @app.route('/graphMode', methods=['POST'])
+@validate_token
 def startProcces():
   data = request.json
   graphMode = data['graph']
@@ -92,6 +93,7 @@ def startProcces():
   return response
 
 @app.route('/clearMode', methods=['POST'])
+@validate_token
 def clearMode():
   deletePath(request.json)
   return { 'success': True, 'data': 'Archivos eliminados exitosamente' }
@@ -110,7 +112,7 @@ def startProcess():
   lenListFiles = len(body['listFiles'])
   playerName = body['name']
   column = body['columns']
-  path = '{}/data'.format(documentNumber)
+  path = body['rootFiles']
   listDataset = []
   try:
     for idx in range(lenListFiles):
@@ -142,7 +144,8 @@ def startProcess():
     documentNumber,
     playerName,
     column,
-    nameVariable
+    nameVariable,
+    body['gestureType']
   ])
 
   if not finalDatasetList['success']:
